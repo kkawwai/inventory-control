@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="datetime_list">
+    <h2>指定した範囲内に入荷した商品を検索できます。</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="name">開始日を指定してください:</label>
+        <input type="date" name="start_date">
+        <br>
+        <label for="stock">終了日を指定してください:</label>
+        <input type="date" name="end_date">
+        <br>
+        <label for="product">検索する場所:</label>
+        <select name="product">
+            <option value="Product">倉庫</option>
+            <option value="Branch_one">支店1</option>
+            <option value="Branch_two">支店2</option>
+            <option value="Branch_three">支店3</option>
+            <option value="Central_product">セントラルキッチン</option>
+        </select>
+        <input type="submit" value="検索">
+    </form>
+    <div class="my_objects">
+        {% if my_objects %}
+        <table border="1" class="datetime-table">
+            <tr>
+                <td>商品名</td>
+                <td>在庫数</td>
+                <td>重さ</td>
+                <td>金額</td>
+                <td>分類</td>
+                <td>入荷日</td>
+            </tr>
+            {% for obj in my_objects %}
+            <tr>
+                <td>{{ obj.name }}</td>
+                <td>{{ obj.stock }}</td>
+                <td>{{ obj.weight }}</td>
+                <td>{{ obj.cost }}</td>
+                <td>{{ obj.classification }}</td>
+                <td>{{ obj.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% else %}
+        <p>取得したデータが表示されます</p>
+    {% endif %}
+</div>
+{% endblock %}

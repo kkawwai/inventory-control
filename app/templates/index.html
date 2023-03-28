@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="main post">
+    <div class="container ">
+        <h2>倉庫の在庫</h2>
+        <table border="1" >
+            <tr>
+                <td>商品名</td>
+                <td>在庫数</td>
+                <td>重さ</td>
+                <td>金額</td>
+                <td>分類</td>
+                <td>入荷日</td>
+            </tr>
+            {% for product in object_list %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.stock }}</td>
+                <td>{{ product.weight }}</td>
+                <td>{{ product.cost }}</td>
+                <td>{{ product.classification }}</td>
+                <td>{{ product.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                        <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            {% for page_num in page_obj.paginator.page_range %}
+                {% if page_obj.number == page_num %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+            </ul>
+        {% endif %}
+        <div class="create">
+            <h4>商品を追加する</h4>
+            <form method="POST" action="{% url 'app:create' %}">
+                {% csrf_token %}
+                <label for="name">商品名:</label>
+                <input type="text" name="name" id="name" required placeholder="商品名を入力">
+                <br>
+                <label for="weight">重さ:</label>
+                <input type="number" name="weight" id="weight" min="0" required placeholder="重さを入力">
+                <br>
+                <label for="cost">金額:</label>
+                <input type="number" name="cost" id="cost" min="0" required placeholder="金額を入力">
+                <br>
+                <label for="stock">入荷数:</label>
+                <input type="number" name="stock" id="stock" min="0" required placeholder="入荷数">
+                <br>
+                <label for="classification">分類:</label>
+                <select name="classification">
+                    <option value="野菜">野菜</option>
+                    <option value="肉類">肉類</option>
+                    <option value="フルーツ">フルーツ</option>
+                    <option value="調味料">調味料</option>
+                    <option value="その他">その他</option>
+                </select>
+                <input type="submit" value="送る">
+            </form>
+            <h4>在庫の商品を店舗に送る</h4>
+            <form method="POST" action="{% url 'app:more' %}">
+                {% csrf_token %}
+                <label for="name">商品名:</label>
+                <input type="text" name="name" id="name" required placeholder="商品名を入力">
+                <br>
+                <label for="stock">在庫数:</label>
+                <input type="number" name="stock" id="stock" min="0" required placeholder="数を入力">
+                <br>
+                <label for="product">送る場所を指定:</label>
+                <select name="product">
+                    <option value="Branch_one">支店1</option>
+                    <option value="Branch_two">支店2</option>
+                    <option value="Branch_three">支店3</option>
+                    <option value="Central_product">セントラルキッチン</option>
+                </select>
+                <input type="submit" value="送る">
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+                        {{ message }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+<div class="box-branch">
+    <div class="one">
+        <h2>支店1の在庫</h2>
+        <table border="1" >
+            <tr>
+                <td>商品名</td>
+                <td>在庫数</td>
+                <td>重さ</td>
+                <td>金額</td>
+                <td>分類</td>
+                <td>入荷日</td>
+            </tr>
+            {% for branch_one in branch_one_page_obj %}
+            <tr>
+                <td>{{ branch_one.name }}</td>
+                <td>{{ branch_one.stock }}</td>
+                <td>{{ branch_one.weight }}</td>
+                <td>{{ branch_one.cost }}</td>
+                <td>{{ branch_one.classification }}</td>
+                <td>{{ branch_one.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if branch_one_page_obj.has_other_pages %}
+        <ul class="pagination">
+            {% if branch_one_page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?branch_one_page=1">&laquo; first</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?branch_one_page={{ branch_one_page_obj.previous_page_number }}">previous</a>
+            </li>
+            {% endif %}
+        {% for page_num in branch_one_page_obj.paginator.page_range %}
+            {% if branch_one_page_obj.number == page_num %}
+                <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?branch_one_page={{ page_num }}">{{ page_num }}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% if branch_one_page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?branch_one_page={{ branch_one_page_obj.next_page_number }}">next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?branch_one_page={{ branch_one_page_obj.paginator.num_pages }}">last &raquo;</a>
+            </li>
+        {% endif %}
+        </ul>
+        {% endif %}
+    </div>
+    <div class="one">
+        <h2>支店2の在庫</h2>
+        <table border="1" >
+            <tr>
+                <td>商品名</td>
+                <td>在庫数</td>
+                <td>重さ</td>
+                <td>金額</td>
+                <td>分類</td>
+                <td>入荷日</td>
+            </tr>
+            {% for branch_two in branch_two_page_obj %}
+            <tr>
+                <td>{{ branch_two.name }}</td>
+                <td>{{ branch_two.stock }}</td>
+                <td>{{ branch_two.weight }}</td>
+                <td>{{ branch_two.cost }}</td>
+                <td>{{ branch_two.classification }}</td>
+                <td>{{ branch_two.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if branch_two_page_obj.has_other_pages %}
+        <ul class="pagination">
+            {% if branch_two_page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?branch_two_page=1">&laquo; first</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?branch_two_page={{ branch_two_page_obj.previous_page_number }}">previous</a>
+            </li>
+            {% endif %}
+        {% for page_num in branch_two_page_obj.paginator.page_range %}
+            {% if branch_two_page_obj.number == page_num %}
+                <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?branch_two_page={{ page_num }}">{{ page_num }}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% if branch_two_page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?branch_two_page={{ branch_two_page_obj.next_page_number }}">next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?branch_two_page={{ branch_two_page_obj.paginator.num_pages }}">last &raquo;</a>
+            </li>
+        {% endif %}
+        </ul>
+        {% endif %}
+    </div>
+    <div class="one">
+        <h2>支店3の在庫</h2>
+        <table border="1" >
+            <tr>
+                <td>商品名</td>
+                <td>在庫数</td>
+                <td>重さ</td>
+                <td>金額</td>
+                <td>分類</td>
+                <td>入荷日</td>
+            </tr>
+            {% for branch_three in branch_three_pge_obj %}
+            <tr>
+                <td>{{ branch_three.name }}</td>
+                <td>{{ branch_three.stock }}</td>
+                <td>{{ branch_three.weight }}</td>
+                <td>{{ branch_three.cost }}</td>
+                <td>{{ branch_three.classification }}</td>
+                <td>{{ branch_three.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if branch_three_page_obj.has_other_pages %}
+        <ul class="pagination">
+            {% if branch_three_page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?branch_three_page=1">&laquo; first</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?branch_three_page={{ branch_three_page_obj.previous_page_number }}">previous</a>
+            </li>
+            {% endif %}
+        {% for page_num in branch_three_page_obj.paginator.page_range %}
+            {% if branch_three_page_obj.number == page_num %}
+                <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?branch_three_page={{ page_num }}">{{ page_num }}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% if branch_three_page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?branch_three_page={{ branch_three_page_obj.next_page_number }}">next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?branch_three_page={{ branch_three_page_obj.paginator.num_pages }}">last &raquo;</a>
+            </li>
+        {% endif %}
+        </ul>
+        {% endif %}
+    </div>
+    <div class="one">
+        <h2>セントラルの在庫</h2>
+        <table border="1" >
+            <tr>
+                <td>商品名</td>
+                <td>在庫数</td>
+                <td>重さ</td>
+                <td>金額</td>
+                <td>分類</td>
+                <td>入荷日</td>
+            </tr>
+            {% for central_product in central_page_obj %}
+            <tr>
+                <td>{{ central_product.name }}</td>
+                <td>{{ central_product.stock }}</td>
+                <td>{{ central_product.weight }}</td>
+                <td>{{ central_product.cost }}</td>
+                <td>{{ central_product.classification }}</td>
+                <td>{{ central_product.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% if central_page_obj.has_other_pages %}
+        <ul class="pagination">
+            {% if central_page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?central_page=1">&laquo; first</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?central_page={{ central_page_obj.previous_page_number }}">previous</a>
+            </li>
+            {% endif %}
+        {% for page_num in central_page_obj.paginator.page_range %}
+            {% if central_page_obj.number == page_num %}
+                <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?central_page={{ page_num }}">{{ page_num }}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% if central_page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?central_page={{ central_page_obj.next_page_number }}">next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?central_page={{ central_page_obj.paginator.num_pages }}">last &raquo;</a>
+            </li>
+        {% endif %}
+        </ul>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+    {% if my_objects %}
+    <ul>
+    {% for obj in my_objects %}
+    <li>{{ obj.name }} - {{ obj.weight }} - {{ obj.stock }} - {{ obj.cost }} - {{ obj.classification }}</li>
+    {% endfor %}
+    </ul>
+    {% else %}
+    <p>No objects found.</p>
+    {% endif %}
+{% endblock %}
+
+
+
+<h4>商品を追加する</h4>
+            <form method="POST" action="{% url 'app:create' %}">
+                {% csrf_token %}
+                <label for="name">商品名:</label>
+                <input type="text" name="name" id="name" required placeholder="商品名を入力">
+                <br>
+                <label for="weight">重さ:</label>
+                <input type="number" name="weight" id="weight" min="0" required placeholder="重さを入力">
+                <br>
+                <label for="cost">金額:</label>
+                <input type="number" name="cost" id="cost" min="0" required placeholder="金額を入力">
+                <br>
+                <label for="stock">入荷数:</label>
+                <input type="number" name="stock" id="stock" min="0" required placeholder="入荷数">
+                <br>
+                <label for="classification">分類:</label>
+                <select name="classification">
+                    <option value="野菜">野菜</option>
+                    <option value="肉類">肉類</option>
+                    <option value="フルーツ">フルーツ</option>
+                    <option value="調味料">調味料</option>
+                    <option value="その他">その他</option>
+                </select>
+                <input type="submit" value="送る">
+            </form>
+
+
+create.html
+            <form method="POST" class="form-control">
+                {% csrf_token %}
+                <table>
+                    <tr>
+                        {{ form.as_table }}
+                    </tr>
+                </table>
+                <button class="btn" type="submit">在庫に追加する</button>
+            </form>
+
+
+   base.html
+            <div class="main">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+
+
+
+index.html
+        {% block content %}
+        <div class="main post">
+            <div class="container ">
+                <h2>在庫</h2>
+                <table border="1" >
+                    <tr>
+                        <td>商品名</td>
+                        <td>在庫数</td>
+                        <td>重さ</td>
+                        <td>金額</td>
+                        <td>分類</td>
+                        <td>入荷日</td>
+                    </tr>
+                    {% for product in object_list %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.stock }}</td>
+                        <td>{{ product.weight }}</td>
+                        <td>{{ product.cost }}</td>
+                        <td>{{ product.classification }}</td>
+                        <td>{{ product.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% if is_paginated %}
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% for page_num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == page_num %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    </ul>
+                {% endif %}
+                <div class="create">
+                    <h4>商品を追加する</h4>
+                    <form method="POST" action="{% url 'app:create' %}">
+                        {% csrf_token %}
+                        <label for="name">商品名:</label>
+                        <input type="text" name="name" id="name" required placeholder="商品名を入力">
+                        <br>
+                        <label for="weight">重さ:</label>
+                        <input type="number" name="weight" id="weight" min="0" required placeholder="重さを入力">
+                        <br>
+                        <label for="cost">金額:</label>
+                        <input type="number" name="cost" id="cost" min="0" required placeholder="金額を入力">
+                        <br>
+                        <label for="stock">入荷数:</label>
+                        <input type="number" name="stock" id="stock" min="0" required placeholder="入荷数">
+                        <br>
+                        <label for="classification">分類:</label>
+                        <select name="classification">
+                            <option value="野菜">野菜</option>
+                            <option value="肉類">肉類</option>
+                            <option value="フルーツ">フルーツ</option>
+                            <option value="調味料">調味料</option>
+                            <option value="その他">その他</option>
+                        </select>
+                        <input type="submit" value="送る">
+                    </form>
+                    <h4>在庫の商品を店舗に送る</h4>
+                    <form method="POST" action="{% url 'app:more' %}">
+                        {% csrf_token %}
+                        <label for="name">商品名:</label>
+                        <input type="text" name="name" id="name" required placeholder="商品名を入力">
+                        <br>
+                        <label for="stock">在庫数:</label>
+                        <input type="number" name="stock" id="stock" min="0" required placeholder="数を入力">
+                        <br>
+                        <label for="product">送る場所を指定:</label>
+                        <select name="product">
+                            <option value="Branch_one">支店1</option>
+                            <option value="Branch_two">支店2</option>
+                            <option value="Branch_three">支店3</option>
+                            <option value="Central_product">セントラルキッチン</option>
+                        </select>
+                        <input type="submit" value="送る">
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endblock %}
+
+
+        index.html branch_one_list_page
+        <div class="pagination">
+            <span class="step-links">
+                {% if branch_one_page_obj.has_previous %}
+                <a href="?branch_one_page=1">&laquo; first</a>
+                <a href="?branch_one_page={{ branch_one_page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+                <span class="current-page">Page {{ branch_one_page_obj.number }} of {{ branch_one_page_obj.paginator.num_pages }}.</span>
+                {% if branch_one_page_obj.has_next %}
+                <a href="?branch_one_page={{ branch_one_page_obj.next_page_number }}">next</a>
+                <a href="?branch_one_page={{ branch_one_page_obj.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+        {% endif %}
+    </div>
